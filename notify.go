@@ -15,14 +15,14 @@ buildMessage prepares the title and body of the notification
 Parameters:
 
 	email    - Data from the received email
-	junction - The Junction to send to
+	junction_handler - The Junction Handler to send to
 
 Returns:
 
 	title - The notification title
 	body  - The notification body
 */
-func buildMessage(email EmailData, junction Junction) (title string, body string, url string) {
+func buildMessage(email EmailData, junction_handler JunctionHandler) (title string, body string, url string) {
 	// Prepare the data used by the Template
 	templateData := struct {
 		Subject string   // The received email's subject line
@@ -44,9 +44,9 @@ func buildMessage(email EmailData, junction Junction) (title string, body string
 
 	// If the Junction provides a Title Template, parse it
 	// Else, use the Email Subject
-	if junction.Title != "" {
+	if junction_handler.Title != "" {
 		builder := &strings.Builder{}
-		template, err := template.New("title").Parse(junction.Title)
+		template, err := template.New("title").Parse(junction_handler.Title)
 		if err != nil {
 			log.Error().Err(err).Msg("Can't parse the title")
 		}
@@ -59,9 +59,9 @@ func buildMessage(email EmailData, junction Junction) (title string, body string
 
 	// If the Junction provides a Body Template, parse it
 	// Else use the Email Body
-	if junction.Body != "" {
+	if junction_handler.Body != "" {
 		builder := &strings.Builder{}
-		template, err := template.New("body").Parse(junction.Body)
+		template, err := template.New("body").Parse(junction_handler.Body)
 		if err != nil {
 			log.Error().Err(err).Msg("Can't parse the body")
 		}
@@ -74,7 +74,7 @@ func buildMessage(email EmailData, junction Junction) (title string, body string
 
 	// Build the URL template
 	builder := &strings.Builder{}
-	template, err := template.New("url").Parse(junction.Apprise)
+	template, err := template.New("url").Parse(junction_handler.Apprise)
 	if err != nil {
 		log.Error().Err(err).Msg("Can't parse the url")
 	}

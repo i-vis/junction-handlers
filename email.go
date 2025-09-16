@@ -77,25 +77,33 @@ func mailHandler(remoteIP net.Addr, from string, to []string, data []byte) error
 	junction := junctions[index]
 
 	// Prepare the title and body for the message
-	title, body, url := buildMessage(EmailData{
-		to,
-		from,
-		emailSubject,
-		emailBody,
-		emailDate,
-		ip,
-	}, junction)
+	for handler_index, junction_handler := range junction.Handlers {
+		title, body, url := buildMessage(EmailData{
+			to,
+			from,
+			emailSubject,
+			emailBody,
+			emailDate,
+			ip,
+		}, junction_handler)
 
-	// Get the index or junction name for the logs
-	id := func() string {
-		if junction.Name == "" {
-			return fmt.Sprint(index)
+		// Get the index or junction name for the logs
+		id := func() string {
+			var handler_name string
+			if junction_handler.Name == "" {
+				handler_name = fmt.Sprint(handler_index)
+			} else {
+				handler_name = junction_handler.Name
+			}
+			if junction.Name == "" {
+				return fmt.Sprintf("%d.%s", index, handler_name)
+			}
+			return fmt.Sprintf("%s.%s", junction.Name, handler_name)
 		}
-		return junction.Name
-	}
 
-	// Send it
-	log.Info().Str("junction id", id()).Msg("Sending Notification")
-	sendNotification(title, body, url)
+		// Send it
+		log.Info().Str("junction id", id()).Msg("Sending Notification")
+		sendNotification(title, body, url)
+	}
 	return nil
 }

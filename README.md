@@ -14,34 +14,31 @@ Once matched, Junction will create the notification from the optionally provided
 Junction is configured with a yaml file. By default, this file is read from `<APP DIRECTORY>/config/config.yaml`.
 
 Available configuration options and any applicable defaults are described below:
-
-`log-level:` Optional. Defaults to `info`. Can be set to `debug` to output more information during application runtime.
-
-`port:` Optional. Defaults to `8025`. The port to listen on for emails. Do not change if using Docker.
-
-`junctions:` Required. A list of configurations that received emails are matched against.
+|Option|Description|
+|---|---|
+|`log-level:`| Optional. Defaults to `info`. Can be set to `debug` to output more information during application runtime. |
+|`port:`| Optional. Defaults to `8025`. The port to listen on for emails. Do not change if using Docker.|
+|`junctions:`| Required. A list of configurations that received emails are matched against.|
 
 Junctions are configured with the following values.
+|Option|Description|
+|---|---|
+|`name:`| Optional. Just used for easier identification of the junction used. Has no effect on application execution.|
+|`to:`| Optional. If not included, every incoming email will match the this portion of the junction.|
+|&nbsp;&nbsp;`emails:`| A list of email addresses that the received email must be sent to.|
+|&nbsp;&nbsp;`require-all:`| `true` or `false`, defaults to `false`. If set to `true`, and multiple email addresses are listed, every email address listed must be present for the received email to match the junction. If unset, or `false`, only one of the listed email addresses needs to be present.|
+|`from:`| Optional. If not included, every incoming email will match this portion of the junction.|
+|&nbsp;&nbsp;`email:`| Optional. The email address that the received email must be sent from.|
+|&nbsp;&nbsp;`ip:`| Optional. The IP Address of the machine that the received email must be sent from.|
+|&nbsp;&nbsp;`handlers:`| A list of handlers that send the contents of the received email to some apprise URLs.|
 
-`name:` Optional. Just used for easier identification of the junction used. Has no effect on application execution.
-
-`apprise:` Required. The [Apprise URL](https://github.com/caronc/apprise/wiki/URLBasics) to send to.
-
-`to:` Optional. If not included, every incoming email will match the this portion of the junction.
-
-&nbsp;&nbsp;`emails:` A list of email addresses that the received email must be sent to.
-
-&nbsp;&nbsp;`require-all:` `true` or `false`, defaults to `false`. If set to `true`, and multiple email addresses are listed, every email address listed must be present for the received email to match the junction. If unset, or `false`, only one of the listed email addresses needs to be present.
-
-`from:` Optional. If not included, every incoming email will match this portion of the junction.
-
-&nbsp;&nbsp;`email:` Optional. The email address that the received email must be sent from.
-
-&nbsp;&nbsp;`ip:` Optional. The IP Address of the machine that the received email must be sent from.
-
-`title:` Optional. What is displayed in the notification's title. Defaults to the received email's subject. See [templating](#templating) below for further information.
-
-`body:` Optional. What is displayed in the notification's body. Defaults to the received email's subject. See [templating](#templating) below for further information.
+Each handler has these options:
+|Option|Description|
+|---|---|
+|`name:`| Optional. Just used for easier identification of the junction handler used. Has no effect on application execution.|
+|`apprise:`| Required. The [Apprise URL](https://github.com/caronc/apprise/wiki/URLBasics) to send to.|
+|`title:`| Optional. What is displayed in the notification's title. Defaults to the received email's subject. See [templating](#templating) below for further information.|
+|`body:`| Optional. What is displayed in the notification's body. Defaults to the received email's subject. See [templating](#templating) below for further information.|
 
 
 **Junctions are matched top down. More specific conditions should be placed to the top, and broader to the bottom**
@@ -52,7 +49,8 @@ Junctions are configured with the following values.
 Minimal:
 ```yaml
 junctions:
-  - apprise: <Apprise URL>
+  - handlers:
+    - apprise: <Apprise URL>
 ```
 With this configuration, every email received will be sent to the provided Apprise URL.
 
@@ -63,7 +61,6 @@ log-level: debug
 port: 25
 junctions:
   - name: Very Specific
-    apprise: <Apprise URL>
     to:
       emails:
         - person1@example.com
@@ -72,24 +69,27 @@ junctions:
     from:
       email: server@example.com
       ip: 1.1.1.1
+    - handlers:
+        - apprise: <Apprise URL>
   - name: Less Specific
-    apprise: <Apprise URL>
     to:
       emails:
         - person1@example.com
     from:
       email: server@example.com
       ip: 1.1.1.1
+    - handlers:
+        - apprise: <Apprise URL>
   - name: Less Specific 2
-    apprise: <Apprise URL>
     to:
       emails:
         - person2@example.com
     from:
       email: server@example.com
       ip: 1.1.1.1
+    - handlers:
+        - apprise: <Apprise URL>
   - name: Less Less Specific
-    apprise: <Apprise URL>
     to:
       emails:
         - person1@example.com
@@ -97,22 +97,28 @@ junctions:
     from:
       email: server@example.com
       ip: 1.1.1.1
+    - handlers:
+        - apprise: <Apprise URL>
   - name: No To
-    apprise: <Apprise URL>
     from:
       email: server@example.com
       ip: 1.1.1.1
+    - handlers:
+        - apprise: <Apprise URL>
   - name: No To
-    apprise: <Apprise URL>
     from:
       email: server@example.com
       ip: 1.1.1.1
+    - handlers:
+        - apprise: <Apprise URL>
   - name: No To 2
-    apprise: <Apprise URL>
     from:
       ip: 1.1.1.1
+    - handlers:
+        - apprise: <Apprise URL>
   - name: Catch All
-    apprise: <Apprise URL>
+    - handlers:
+        - apprise: <Apprise URL>
 ```
 With this configuration:
 - Extra information will be output by the application for debugging
@@ -194,3 +200,4 @@ If desired, you can change the location of the configuration file with the `CONF
 - [ ] SMTP server authentication
 - [ ] Optional configuration web UI
 - [ ] Option to save emails in a database
+

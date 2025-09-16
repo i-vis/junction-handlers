@@ -6,11 +6,17 @@ import (
 
 type Junction struct {
 	Name    string   `yaml:"name,omitempty"`
-	Apprise string   `yaml:"apprise"`
 	To      JuncTo   `yaml:"to,omitempty"`
 	From    JuncFrom `yaml:"from,omitempty"`
+	Handlers []JunctionHandler `yaml:"handlers,omitempty"`
+}
+
+type JunctionHandler struct {
+	Name    string   `yaml:"name,omitempty"`
+	Apprise string   `yaml:"apprise"`
 	Title   string   `yaml:"title,omitempty"`
 	Body    string   `yaml:"body,omitempty"`
+
 }
 
 type JuncTo struct {
