@@ -8,7 +8,7 @@ type Junction struct {
 	Name    string   `yaml:"name,omitempty"`
 	To      JuncTo   `yaml:"to,omitempty"`
 	From    JuncFrom `yaml:"from,omitempty"`
-	Handlers []JunctionHandler `yaml:"handlers,omitempty"`
+	Handlers []JunctionHandler `yaml:"handlers"`
 }
 
 type JunctionHandler struct {
